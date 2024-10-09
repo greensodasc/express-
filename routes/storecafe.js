@@ -1,6 +1,5 @@
 import express from 'express'
 const router = express.Router()
-
 // 資料庫直接使用mysql和sql來查詢
 import db from '##/configs/mysql.js'
 
@@ -10,7 +9,7 @@ router.get('/', async function (req, res) {
 
   // 關鍵字 (查詢字串qs: name_like=sa)
   const store_name = req.query.name_like || ''
-  conditions[0] = store_name ? `orderlist_id LIKE '%${store_name}%'` : ''
+  conditions[0] = store_name ? `store_name LIKE '%${store_name}%'` : ''
 
   //編號
   const store_id = req.query.menber_id || ''
@@ -25,22 +24,30 @@ router.get('/', async function (req, res) {
   const order = req.query.order || 'asc'
 
   const orderBy = `ORDER BY ${sort} ${order}`
+
+  // 城市篩選
+  // const allowedCities = ['台北', '高雄', '台南', '台中', '新竹']
+  // const store_city = req.query.store_city || ''
+  // if (store_city && allowedCities.includes(store_city)) {
+  //   conditions.push(`store_city = '${store_city}'`)
+  // }
+
   //分頁
   const page = Number(req.query.page) || 1
   const perpage = Number(req.query.perpage) || 15
   const limit = perpage
   const offset = (page - 1) * perpage
 
-  const [rows] = await db.query(
+  const [storerows] = await db.query(
     `SELECT * FROM storecafe ${where} ${orderBy} LIMIT ${limit} OFFSET ${offset}`
   )
 
-  const products = rows
+  const store = storerows
   // 處理如果沒找到資料
 
   // 進行分頁時，額外執行sql在此條件下總共多少筆資料
-  const [rows2] = await db.query(`SELECT COUNT(*) AS count FROM storecafe`)
-  const { count } = rows2[0]
+  const [storerows2] = await db.query(`SELECT COUNT(*) AS count FROM storecafe`)
+  const { count } = storerows2[0]
   // 計算總頁數
   const pageCount = Math.ceil(count / perpage)
   // 標準回傳JSON
@@ -51,7 +58,7 @@ router.get('/', async function (req, res) {
       pageCount,
       page,
       perpage,
-      products,
+      store,
     },
   })
 })
