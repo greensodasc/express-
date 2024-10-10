@@ -25,13 +25,6 @@ router.get('/', async function (req, res) {
 
   const orderBy = `ORDER BY ${sort} ${order}`
 
-  // 城市篩選
-  // const allowedCities = ['台北', '高雄', '台南', '台中', '新竹']
-  // const store_city = req.query.store_city || ''
-  // if (store_city && allowedCities.includes(store_city)) {
-  //   conditions.push(`store_city = '${store_city}'`)
-  // }
-
   //分頁
   const page = Number(req.query.page) || 1
   const perpage = Number(req.query.perpage) || 15
